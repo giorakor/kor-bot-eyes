@@ -1,0 +1,17 @@
+.App {
+  background-color: black;
+  position: relative;
+  text-align: center;
+}
+
+.eye,
+.pupil,
+.eyewhite,
+.eyelids,
+.absolute {
+  position: absolute;
+}
+
+.pupil {
+  transition: ease-in-out 0.3s;
+}
