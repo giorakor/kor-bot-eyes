@@ -58,7 +58,7 @@ const EyeLid = props => {
       setControls(() => {
         if (counter >= frameRate * transTime) {
           clearInterval(animationInterval);
-          if (state.blinking) {
+          if (blinking) {
             actions.stopBlink();
           }
           return destControls;
