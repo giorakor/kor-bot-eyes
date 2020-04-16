@@ -7,6 +7,8 @@ import { useActions } from "./mainActions";
 import PositionsContext from "../context/Positions";
 import Eye from "../components/Eye";
 
+const { ipcRenderer } = window.require("electron");
+
 const initialPositions = {
   screenWidth: 1280,
   screenHeight: 800,
@@ -60,8 +62,20 @@ const Main = props => {
     y: eyesY
   };
 
+  let avgYaw = 0;
   useEffect(() => {
     actions.lookTo({ x: 0, y: 0 });
+    ipcRenderer.on("data", (err, data) => {
+      const { pitch, yaw } = data;
+      avgYaw = avgYaw * 0.9 + (1 - 0.9) * yaw;
+      const yMove = U.constrain(pitch * 10, -50, 50);
+      const xMove = U.constrain((yaw - avgYaw) * 10, -100, 100);
+      actions.lookTo({ x: xMove, y: yMove });
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners();
+    }
   }, []);
 
   const {
