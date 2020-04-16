@@ -46,14 +46,14 @@ const mainReducer = (state, action) => {
       )
     case Actions.BLINK:
       return (
-        {
+        !state.blinking ? {
           ...state,
           rightEyeMode: action.mode,
           leftEyeMode: action.mode,
           transTime: action.transTime,
           beforeBlink: state.leftEyeMode,
           blinking: true
-        }
+        } : state
       )
     case Actions.STOP_BLINK:
       return (

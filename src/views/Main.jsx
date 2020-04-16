@@ -7,6 +7,8 @@ import { useActions } from "./mainActions";
 import PositionsContext from "../context/Positions";
 import Eye from "../components/Eye";
 
+const { ipcRenderer } = window.require("electron");
+
 const initialPositions = {
   screenWidth: 1280,
   screenHeight: 800,
@@ -60,8 +62,20 @@ const Main = props => {
     y: eyesY
   };
 
+  let avgYaw = 0;
   useEffect(() => {
     actions.lookTo({ x: 0, y: 0 });
+    ipcRenderer.on("data", (err, data) => {
+      const { pitch, yaw } = data;
+      avgYaw = avgYaw * 0.9 + (1 - 0.9) * yaw;
+      const yMove = U.constrain(pitch * 10, -50, 50);
+      const xMove = U.constrain(-(yaw - avgYaw) * 10, -100, 100);
+      // actions.lookTo({ x: xMove, y: yMove });
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners();
+    }
   }, []);
 
   const {
@@ -102,7 +116,7 @@ const Main = props => {
         <Eye type="R" pos={firstEyePos}/>
         <Eye type="L" pos={secondEyePos}/>
       </PositionsContext.Provider>
-      {/* <button onClick={() => actions.lookTo({ x: -100, y: 0 })}>left</button>
+      <button onClick={() => actions.lookTo({ x: -100, y: 0 })}>left</button>
       <button onClick={() => actions.lookTo({ x: 0, y: 0 })}>center</button>
       <button onClick={() => actions.lookTo({ x: 100, y: 0 })}>right</button>
       <button onClick={() => actions.setMode("NORMAL", 0.2)}>normal</button>
@@ -111,7 +125,7 @@ const Main = props => {
       <button onClick={() => actions.setMode("MAD", 0.3)}>mad</button>
       <button onClick={() => actions.setMode("SHOCK", 0.3)}>shock</button>
       <button onClick={() => actions.setMode("WORRIED", 0.3)}>worried</button>
-      <h1 style={{backgroundColor: "white"}}>{state.leftEyeMode}, {state.rightEyeMode}</h1> */}
+      <h1 style={{backgroundColor: "white"}}>{state.leftEyeMode}, {state.rightEyeMode}</h1>
     </div>
   );
 }
