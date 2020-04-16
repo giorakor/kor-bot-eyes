@@ -1,42 +1,12 @@
 import _ from "lodash";
 import React, { useContext, useState, useEffect } from "react";
 
+import Modes from "../modes";
 import PositionsContext from "../context/Positions";
 import { useActions } from "../views/mainActions";
 
 const getControlsText = (cAX, cAY, cBX, cBY) => {
   return `C ${cAX} ${cAY} , ${cBX} ${cBY}`;
-}
-
-const getControls = mode => {
-  switch (mode) {
-    case "NORMAL":
-      return [0.7, 0.3, 0.3, -0.1, 0.6, 0.9, 0.25, 0.9];
-
-    case "BLINK":
-      return [0.75, 0.9, 0.25, 0.9, 0.75, 0.9, 0.25, 0.9];
-
-    case "SNAKE":
-      return [0.50, 0.6, 0.30, 0.6, 0.58, 0.8, 0.25, 0.9];
-
-    case "MAD":
-      return [0.71, 0.0, 0.30, 0.7, 0.58, 0.8, 0.25, 0.9];
-
-    case "WORRIED":
-      return [0.59, 0.6, 0.30, -0.4, 0.58, 0.7, 0.25, 0.7];
-
-    case "SHOCK":
-      return [0.75, -0.3, 0.25, -0.3, 0.75, 1, 0.25, 1];
-
-    default:
-      return [0.7, 0.3, 0.3, -0.1, 0.6, 0.9, 0.25, 0.9];
-  }
-}
-
-const reachedControls = (destControls, controls) => {
-  return _.every(destControls, (control, key) =>
-    Math.abs(control - controls[key]) < 0.01
-  );
 }
 
 const frameRate = 24;
@@ -47,27 +17,37 @@ const EyeLid = props => {
   const actions = useActions(dispatch);
 
   const {
+    mode,
     type
   } = props;
-  const isRight = type === "R";
 
   const {
     eyeWidth,
     eyeHeight,
-    leftEyeMode,
-    rightEyeMode,
-    transTime
+    rightPupilPos,
+    leftPupilPos,
+    randomMoveAmount,
+    transTime,
+    blinking
   } = state;
 
-  const mode = isRight ? rightEyeMode : leftEyeMode;
+  const isRight = type === "R";
 
-  const [controls, setControls] = useState(getControls(mode));
+  const pos = isRight ? rightPupilPos : leftPupilPos;
+  const center = [eyeWidth/2, eyeHeight/2];
+
+  const [controls, setControls] = useState(Modes(mode).controls);
 
   useEffect(() => {
-    if (state.blinking && (state.leftEyeMode !== "BLINK" || state.rightEyeMode !== "BLINK")) {
-      return;
-    }
-    const destControls = getControls(mode);
+    const destControls = Modes(mode).controls.map((control, key) => {
+      const factor = key > 7 ? 8e-7 : 1e-6
+      const idx = Object.keys(pos)[key % 2];
+      const diff = pos[idx] + randomMoveAmount[idx] - center[key%2];
+      const flipX = isRight && idx === "x" ? 1 : -1;
+      const sizeNormal = idx === "x" ? eyeWidth : eyeHeight;
+      return control - sizeNormal * flipX *  factor * diff;
+    });
+
     const controlSteps = _.map(destControls, (val, key) =>
       (val - controls[key]) / (transTime * frameRate)
     );
@@ -84,14 +64,14 @@ const EyeLid = props => {
           return destControls;
         }
 
-        return controlSteps.map((step, key) => controls[key] + counter*step);
+        return controlSteps.map((step, key) => controls[key] + counter * step);
       });
     } , intervalTime);
 
     return () => {
       clearInterval(animationInterval);
     }
-  }, [mode]);
+  }, [mode, pos, randomMoveAmount]);
 
   const startingX = 0;
   const startingY = eyeHeight / 2;
@@ -101,7 +81,7 @@ const EyeLid = props => {
     : "";
 
   return (
-    <svg className="absolute" width={eyeWidth} height={eyeHeight}>
+    <svg className="spline absolute blur" width={eyeWidth} height={eyeHeight}>
       <path
         d={`
           M ${startingX} ${0}
@@ -111,7 +91,8 @@ const EyeLid = props => {
             eyeWidth*controls[0], eyeHeight*controls[1],
             eyeWidth*controls[2], eyeHeight*controls[3]
           )}
-          , ${startingX} ${startingY}
+          , ${eyeWidth*controls[8]} ${eyeHeight*controls[9]}
+          H ${-eyeWidth}
         `}
         transform={transform}
         stroke="black"
@@ -126,12 +107,16 @@ const EyeLid = props => {
             eyeWidth*controls[4], eyeHeight*controls[5],
             eyeWidth*controls[6], eyeHeight*controls[7]
           )}
-          , ${0} ${startingY}
+          , ${eyeWidth*controls[10]} ${eyeHeight*controls[11]}
+          H ${-eyeWidth}
         `}
         transform={transform}
         stroke="black"
         fill="black"
       />
+      <filter id="dropshadow" x="-2" y="-2" width={eyeWidth} height={eyeHeight}>
+        <feGaussianBlur  stdDeviation="1"/>
+      </filter>
     </svg>
   )
 }

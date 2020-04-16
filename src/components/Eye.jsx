@@ -1,53 +1,54 @@
 import React, { useContext } from "react";
-import PropTypes from "prop-types"
 
 import U from "../utils";
+import Modes from "../modes";
 import PositionsContext from "../context/Positions";
 import EyeWhite from "./EyeWhite";
 import Eyelids from "./Eyelids";
 import Pupil from "./Pupil";
-
-const defaultProps = {
-  pos: { x: 0, y: 0 },
-  size: 1,
-  type: "R",
-  pupilPos: { x: 0, y: 0 },
-  eyeLidsMode: "NORMAL"
-}
-
-const propTypes = {
-  pos: PropTypes.object,
-  size: PropTypes.number,
-  type: PropTypes.string,
-  eyeLidsMode: PropTypes.string
-}
 
 const Eye = props => {
   const [state, dispatch] = useContext(PositionsContext);
 
   const {
     pos,
-    eyeLidsMode,
     type
   } = props;
+
+  const isRight = type === "R";
+
+  const {
+    rightPupilPos,
+    leftPupilPos,
+    leftEyeMode,
+    rightEyeMode
+  } = state;
 
   const style = {
     left: U.px(pos.x),
     top: U.px(pos.y)
   }
 
+  const mode = isRight ? rightEyeMode : leftEyeMode;
+
+  const {
+    squint,
+    elevation
+  } = Modes(mode);
+
+  const prevMode = Modes(state.beforeBlink);
+
   return (
     <div className="eye" style={style}>
       <EyeWhite/>
       <Pupil
-        pos={type === "R" ? state.rightPupilPos : state.leftPupilPos}
+        squint={isRight ? squint : -squint}
+        pos={isRight ? rightPupilPos : leftPupilPos}
+        elevation={state.blinking ? prevMode.elevation : elevation }
       />
-      <Eyelids type={type} mode={eyeLidsMode}/>
+      <Eyelids type={type} mode={mode}/>
     </div>
   );
 }
-
-Eye.defaultProps = defaultProps;
-Eye.propTypes = propTypes;
 
 export default Eye;

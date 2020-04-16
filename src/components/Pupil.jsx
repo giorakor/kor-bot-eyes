@@ -2,17 +2,18 @@ import React, { useState, useEffect, useCallback, useContext } from "react";
 
 import U from "../utils";
 import PositionsContext from "../context/Positions";
-import { useActions } from "../views/mainActions";
 import pupilImg from "../img/pupil.png"
 
-const width = 250;
-const height = 250;
+const width = 225;
+const height = 225;
 
 const Pupil = props => {
   const [state, dispatch] = useContext(PositionsContext);
 
   const {
-    pos
+    pos,
+    squint,
+    elevation
   } = props;
 
   const innerStyle = {
@@ -21,8 +22,8 @@ const Pupil = props => {
   }
 
   const style = {
-    left: U.px(pos.x + state.randomMoveAmount.x),
-    top: U.px(pos.y + state.randomMoveAmount.y)
+    left: U.px(pos.x + state.randomMoveAmount.x + squint),
+    top: U.px(pos.y + state.randomMoveAmount.y - elevation)
   }
 
   return (

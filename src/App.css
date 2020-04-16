@@ -15,3 +15,11 @@
 .pupil {
   transition: ease-in-out 0.3s;
 }
+
+.spline {
+  box-shadow: 0 5px 5px rgba(0,0,0,0.3);
+}
+
+.blur {
+  filter: drop-shadow(5px 7px 10px black);
+}
