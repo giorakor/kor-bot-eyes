@@ -64,6 +64,14 @@ const mainReducer = (state, action) => {
           blinking: false
         }
       )
+    case Actions.SET_CONTROLS:
+      return (
+        {
+          ...state,
+          leftEyeControls: !!action.leftEyeControls ? action.leftEyeControls : state.leftEyeControls,
+          rightEyeControls: !!action.leftEyeControls ? action.leftEyeControls : state.leftEyeControls
+        }
+      )
     default:
       return state;
   }

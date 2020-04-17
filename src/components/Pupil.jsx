@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 
 import U from "../utils";
-import PositionsContext from "../context/Positions";
+import RealPositionsContext from "../context/RealPositions";
 import pupilImg from "../img/pupil.png"
 
 const width = 225;
 const height = 225;
 
 const Pupil = props => {
-  const [state, dispatch] = useContext(PositionsContext);
+  const state = useContext(RealPositionsContext);
 
   const {
     pos,

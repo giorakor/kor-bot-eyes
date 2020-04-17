@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 
-import PositionsContext from "../context/Positions";
+import RealPositionsContext from "../context/RealPositions";
 import eyeWhiteImg from "../img/eye-white.png"
 
 const EyeWhite = props => {
-  const [state, dispatch] = useContext(PositionsContext);
+  const state = useContext(RealPositionsContext);
 
   const {
     eyeWidth,
