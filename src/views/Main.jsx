@@ -2,12 +2,15 @@ import React, { useContext, useState, useReducer, useEffect } from "react";
 
 import U from "../utils";
 import Modes from "../modes";
+import useAnimation from "../Animation";
+import { useVReducer } from "../VirtualReducer";
 import mainReducer from "./mainReducer";
 import { useActions } from "./mainActions";
 import PositionsContext from "../context/Positions";
+import RealPositionsContext from "../context/RealPositions";
 import Eye from "../components/Eye";
 
-const { ipcRenderer } = window.require("electron");
+// const { ipcRenderer } = window.require("electron");
 
 const initialPositions = {
   screenWidth: 1280,
@@ -30,14 +33,17 @@ const initialPositions = {
   },
   rightEyeMode: "NORMAL",
   leftEyeMode: "NORMAL",
+  leftEyeControls: Modes("NORMAL").controls,
+  rightEyeControls: Modes("NORMAL").controls,
   transTime: 0.5
 }
 
 const modes = ["SNAKE", "SHOCK", "NORMAL", "WORRIED", "MAD"];
 
 const Main = props => {
-  const [state, dispatch] = useReducer(mainReducer, initialPositions);
-  const actions = useActions(dispatch);
+  const [realState, setState] = useState(initialPositions);
+  const [vState, vDispatch] = useVReducer(mainReducer, initialPositions)
+  const actions = useActions(vDispatch);
 
   const {
     screenWidth,
@@ -45,7 +51,7 @@ const Main = props => {
     eyesDistance,
     eyeWidth,
     eyesY
-  } = state;
+  } = realState;
 
   const style = {
     width: U.px(screenWidth),
@@ -62,25 +68,30 @@ const Main = props => {
     y: eyesY
   };
 
+  useAnimation(setState, []);
+
   let avgYaw = 0;
   useEffect(() => {
     actions.lookTo({ x: 0, y: 0 });
-    ipcRenderer.on("data", (err, data) => {
-      const { pitch, yaw } = data;
-      avgYaw = avgYaw * 0.9 + (1 - 0.9) * yaw;
-      const yMove = U.constrain(pitch * 10, -50, 50);
-      const xMove = U.constrain(-(yaw - avgYaw) * 10, -100, 100);
+    setInterval(() => {
+      actions.lookTo({ x: Math.random()*100 - 50, y: Math.random()*100 - 50 });
+    }, 60);
+    // ipcRenderer.on("data", (err, data) => {
+      // const { pitch, yaw } = data;
+      // avgYaw = avgYaw * 0.9 + (1 - 0.9) * yaw;
+      // const yMove = U.constrain(pitch * 10, -50, 50);
+      // const xMove = U.constrain(-(yaw - avgYaw) * 10, -100, 100);
       // actions.lookTo({ x: xMove, y: yMove });
-    });
+    // });
 
-    return () => {
-      ipcRenderer.removeAllListeners();
-    }
+    // return () => {
+    //   ipcRenderer.removeAllListeners();
+    // }
   }, []);
 
   const {
     shakeSpeed
-  } = Modes(state.leftEyeMode);
+  } = Modes(realState.leftEyeMode);
 
   useEffect(() => {
     const idleInterval = setInterval(() => {
@@ -99,8 +110,8 @@ const Main = props => {
     }, 800);
 
     const stateInterval = setInterval(() => {
-      // const mode = modes[Math.floor(modes.length*Math.random())];
-      // actions.setMode(mode, 0.3);
+      const mode = modes[Math.floor(modes.length*Math.random())];
+      actions.setMode(mode, 0.3);
     }, 2500);
 
     return (() => {
@@ -108,14 +119,14 @@ const Main = props => {
       clearInterval(blinkInterval);
       clearInterval(stateInterval);
     });
-  }, [state.leftEyeMode]);
+  }, [realState.leftEyeMode]);
 
   return (
     <div {...props} style={style}>
-      <PositionsContext.Provider value={[state, dispatch]}>
+      <RealPositionsContext.Provider value={realState}>
         <Eye type="R" pos={firstEyePos}/>
         <Eye type="L" pos={secondEyePos}/>
-      </PositionsContext.Provider>
+      </RealPositionsContext.Provider>
       <button onClick={() => actions.lookTo({ x: -100, y: 0 })}>left</button>
       <button onClick={() => actions.lookTo({ x: 0, y: 0 })}>center</button>
       <button onClick={() => actions.lookTo({ x: 100, y: 0 })}>right</button>
@@ -125,7 +136,7 @@ const Main = props => {
       <button onClick={() => actions.setMode("MAD", 0.3)}>mad</button>
       <button onClick={() => actions.setMode("SHOCK", 0.3)}>shock</button>
       <button onClick={() => actions.setMode("WORRIED", 0.3)}>worried</button>
-      <h1 style={{backgroundColor: "white"}}>{state.leftEyeMode}, {state.rightEyeMode}</h1>
+      <h1 style={{backgroundColor: "white"}}>{realState.leftEyeMode}, {realState.rightEyeMode}</h1>
     </div>
   );
 }

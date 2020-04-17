@@ -3,7 +3,9 @@ import React, { useContext, useState, useEffect } from "react";
 
 import Modes from "../modes";
 import PositionsContext from "../context/Positions";
+import RealPositionsContext from "../context/RealPositions";
 import { useActions } from "../views/mainActions";
+import { getVContext } from "../VirtualReducer";
 
 const getControlsText = (cAX, cAY, cBX, cBY) => {
   return `C ${cAX} ${cAY} , ${cBX} ${cBY}`;
@@ -13,7 +15,8 @@ const frameRate = 24;
 const intervalTime = parseInt((1 / frameRate) * 1000)
 
 const EyeLid = props => {
-  const [state, dispatch] = useContext(PositionsContext);
+  const [vState, dispatch] = getVContext();
+  const state = useContext(RealPositionsContext);
   const actions = useActions(dispatch);
 
   const {
@@ -26,6 +29,8 @@ const EyeLid = props => {
     eyeHeight,
     rightPupilPos,
     leftPupilPos,
+    leftEyeControls,
+    rightEyeControls,
     randomMoveAmount,
     transTime,
     blinking
@@ -34,9 +39,12 @@ const EyeLid = props => {
   const isRight = type === "R";
 
   const pos = isRight ? rightPupilPos : leftPupilPos;
+  const controls = isRight ? leftEyeControls : rightEyeControls;
   const center = [eyeWidth/2, eyeHeight/2];
 
-  const [controls, setControls] = useState(Modes(mode).controls);
+  useEffect(() => {
+    actions.setControls(Modes(mode).controls, isRight);
+  }, [])
 
   useEffect(() => {
     const destControls = Modes(mode).controls.map((control, key) => {
@@ -55,17 +63,17 @@ const EyeLid = props => {
     let counter = 0;
     const animationInterval = setInterval(() => {
       counter += 1;
-      setControls(() => {
         if (counter >= frameRate * transTime) {
           clearInterval(animationInterval);
           if (blinking) {
             actions.stopBlink();
           }
-          return destControls;
+          return actions.setControls(destControls, isRight);
         }
 
-        return controlSteps.map((step, key) => controls[key] + counter * step);
-      });
+        const newControls = controlSteps.map((step, key) => controls[key] + counter * step);
+        actions.setControls(newControls, isRight);
+        return newControls;
     } , intervalTime);
 
     return () => {

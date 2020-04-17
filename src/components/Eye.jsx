@@ -2,13 +2,13 @@ import React, { useContext } from "react";
 
 import U from "../utils";
 import Modes from "../modes";
-import PositionsContext from "../context/Positions";
+import RealPositionsContext from "../context/RealPositions";
 import EyeWhite from "./EyeWhite";
 import Eyelids from "./Eyelids";
 import Pupil from "./Pupil";
 
 const Eye = props => {
-  const [state, dispatch] = useContext(PositionsContext);
+  const state = useContext(RealPositionsContext);
 
   const {
     pos,
