@@ -46,9 +46,9 @@ SerialHelper.init = (options, onMessage) => {
 SerialHelper.parseMessage = message => {
   return {
     pitch: (message[0] - 128) / 10,
-    yaw: (message[1] * 256 + message[2] - 32768) / 10,
-    velocity: (message[3] - 128) / 50,
-    dizzy: message[4]
+    yaw: message[1] - 128,
+    velocity: (message[2] - 128) / 50,
+    dizzy: message[3]
   };
 }
 

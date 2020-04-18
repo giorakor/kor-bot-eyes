@@ -4,8 +4,8 @@ import U from "../utils";
 import RealPositionsContext from "../context/RealPositions";
 import pupilImg from "../img/pupil.png"
 
-const width = 225;
-const height = 225;
+const width = 400;
+const height = 400;
 
 const Pupil = props => {
   const state = useContext(RealPositionsContext);
@@ -15,6 +15,14 @@ const Pupil = props => {
     squint,
     elevation
   } = props;
+
+  const {
+    eyeWidth,
+    eyeHeight
+  } = state;
+
+  const width = eyeWidth * 1.35;
+  const height = eyeHeight * 1;
 
   const innerStyle = {
     left: - width / 2,
