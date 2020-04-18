@@ -12,7 +12,7 @@ const Eye = props => {
 
   const {
     pos,
-    type
+    type,
   } = props;
 
   const isRight = type === "R";
@@ -21,7 +21,9 @@ const Eye = props => {
     rightPupilPos,
     leftPupilPos,
     leftEyeMode,
-    rightEyeMode
+    rightEyeMode,
+    beforeBlink,
+    blinking
   } = state;
 
   const style = {
@@ -30,17 +32,18 @@ const Eye = props => {
   }
 
   const mode = isRight ? rightEyeMode : leftEyeMode;
+  const elevationSquintMode = blinking ? beforeBlink : mode;
 
   const {
     squint,
     elevation
-  } = Modes(mode);
+  } = Modes(elevationSquintMode);
 
   const prevMode = Modes(state.beforeBlink);
 
   return (
     <div className="eye" style={style}>
-      <EyeWhite/>
+      <EyeWhite />
       <Pupil
         squint={isRight ? squint : -squint}
         pos={isRight ? rightPupilPos : leftPupilPos}

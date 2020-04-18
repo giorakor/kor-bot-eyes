@@ -61,6 +61,7 @@ const mainReducer = (state, action) => {
           ...state,
           rightEyeMode: state.beforeBlink,
           leftEyeMode: state.beforeBlink,
+          transTime: action.transTime,
           blinking: false
         }
       )
@@ -69,7 +70,8 @@ const mainReducer = (state, action) => {
         {
           ...state,
           leftEyeControls: !!action.leftEyeControls ? action.leftEyeControls : state.leftEyeControls,
-          rightEyeControls: !!action.leftEyeControls ? action.leftEyeControls : state.leftEyeControls
+          rightEyeControls: !!action.rightEyeControls ? action.rightEyeControls : state.rightEyeControls,
+          transTime: action.transTime
         }
       )
     default:

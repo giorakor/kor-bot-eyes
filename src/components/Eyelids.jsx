@@ -2,7 +2,6 @@ import _ from "lodash";
 import React, { useContext, useState, useEffect } from "react";
 
 import Modes from "../modes";
-import PositionsContext from "../context/Positions";
 import RealPositionsContext from "../context/RealPositions";
 import { useActions } from "../views/mainActions";
 import { getVContext } from "../VirtualReducer";
@@ -66,13 +65,13 @@ const EyeLid = props => {
         if (counter >= frameRate * transTime) {
           clearInterval(animationInterval);
           if (blinking) {
-            actions.stopBlink();
+            actions.stopBlink(0.3);
           }
-          return actions.setControls(destControls, isRight);
+          return actions.setControls(destControls, isRight, transTime - intervalTime/1000);
         }
 
         const newControls = controlSteps.map((step, key) => controls[key] + counter * step);
-        actions.setControls(newControls, isRight);
+        actions.setControls(newControls, isRight, transTime - intervalTime/1000);
         return newControls;
     } , intervalTime);
 
@@ -89,7 +88,7 @@ const EyeLid = props => {
     : "";
 
   return (
-    <svg className="spline absolute blur" width={eyeWidth} height={eyeHeight}>
+    <svg style={{ zIndex: 100 }} className="spline absolute blur" width={eyeWidth} height={eyeHeight}>
       <path
         d={`
           M ${startingX} ${0}
@@ -122,9 +121,6 @@ const EyeLid = props => {
         stroke="black"
         fill="black"
       />
-      <filter id="dropshadow" x="-2" y="-2" width={eyeWidth} height={eyeHeight}>
-        <feGaussianBlur  stdDeviation="1"/>
-      </filter>
     </svg>
   )
 }

@@ -52,21 +52,24 @@ const useActions = dispatch => {
         transTime
       });
     },
-    stopBlink: () => {
+    stopBlink: (transTime) => {
       dispatch({
         type: Actions.STOP_BLINK,
+        transTime
       })
     },
-    setControls: (controls, right) => {
+    setControls: (controls, right, transTime) => {
       if (right) {
         dispatch({
           type: Actions.SET_CONTROLS,
-          rightEyeControls: controls
+          rightEyeControls: controls,
+          transTime
         });
       } else {
         dispatch({
           type: Actions.SET_CONTROLS,
-          leftEyeControls: controls
+          leftEyeControls: controls,
+          transTime
         });
       }
     }
