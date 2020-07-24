@@ -13,8 +13,8 @@ const intervalTime = (1 / frameRate) * 1000;
 const eyeWhiteImg = "./eye-white.png";
 const pupilImg = "./pupil.png";
 
-const screenWidth = 1280;
-const screenHeight = 800;
+const screenWidth = 1000;
+const screenHeight = 576;
 const eyesDistance = 70;
 const eyeWidth = 550;
 const eyeHeight = 500;
