@@ -19,14 +19,14 @@ const MODES = {
     {
       controls: [0.75, 0.85, 0.25, 0.85, 0.75, 0.9, 0.25, 0.9, 0, 0.5, 0, 0.5, 0, 0.5],
       squint: 20,
-      elevation: 0,
+      elevation: -20,
       shakeSpeed: 1
     },
   SNAKE:
     {
       controls: [0.50, 0.6, 0.30, 0.6, 0.58, 0.8, 0.25, 0.9, 0, 0.5, 0, 0.5, 0, 0.5],
       squint: -20,
-      elevation: -80,
+      elevation: -50,
       shakeSpeed: 1
     },
   MAD:

@@ -16,20 +16,22 @@ const pupilImg = "./pupil.png";
 const screenWidth = 1000;
 const screenHeight = 576;
 const eyesDistance = 70;
-const eyeWidth = 550;
-const eyeHeight = 500;
-const pupilWidth = 750;
-const pupilHeight = 500;
+const eyeWidth = 450;
+const eyeHeight = 400;
+const pupilWidth = 700;
+const pupilHeight = 450;
 const eyesY = 100;
+const rightPupilOffset = {
+  x: -55,
+  y: 0
+};
+const leftPupilOffset = {
+  x: -55,
+  y: 0
+};
 
-let rightPupilPos = {
-  x: -45,
-  y: 0
-};
-let leftPupilPos = {
-  x: -45,
-  y: 0
-};
+let rightPupilPos = clone(rightPupilOffset);
+let leftPupilPos = clone(leftPupilOffset);
 let randomMoveAmount = {
   x: 0,
   y: 0
@@ -60,8 +62,8 @@ const blink = transTime => {
 }
 
 const lookTo = (x, y) => {
-  rightPupilPos = { x, y };
-  leftPupilPos = { x, y };
+  rightPupilPos = { x: x + rightPupilOffset.x , y: y + rightPupilOffset.y };
+  leftPupilPos = { x: x + leftPupilOffset.x , y: y + leftPupilOffset.y };
 }
 
 const createEyeLids = isRight => {
@@ -230,13 +232,6 @@ setInterval(() => {
   updateEyeLids(LEFT, $leftLids);
 }, intervalTime);
 
-ipcRenderer.on("data", data => {
-  const { pitch, yaw } = data;
-  const yMove = constrain(pitch * 20, -50, 50);
-  const xMove = constrain(-1 * yaw * 2, -100, 100);
-  lookTo(xMove, yMove);
-});
-
 const modes = Object.keys(MODES);
 
 // Idle interval
@@ -262,3 +257,13 @@ setInterval(() => {
   if (mode === BLINK_MODE) return;
   setMode(mode, 0.3);
 }, 5000);
+
+ipcRenderer.on("data", data => {
+  const { pitch, yaw } = data;
+  console.log(pitch, yaw);
+  console.log(rightEyePos);
+  console.log(randomMoveAmount);
+  const yMove = constrain(pitch * 20, -50, 50);
+  const xMove = constrain(-1 * yaw * 2, -100, 100);
+  lookTo(xMove, yMove);
+});
