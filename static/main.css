@@ -4,6 +4,17 @@
   text-align: center;
 }
 
+* {
+  margin: 0;
+}
+
+.main-screen {
+  position: relative;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+}
+
 .eye,
 .pupil,
 .eyewhite,

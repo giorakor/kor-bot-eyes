@@ -7,12 +7,12 @@
     "cra-template": "1.0.3",
     "lodash": "^4.17.15",
     "prop-types": "^15.7.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "raspi": "^6.0.1",
+    "raspi-serial": "^6.0.0",
   },
   "devDependencies": {
-    "electron": "^8.2.2"
+    "electron": "^8.2.2",
+    "electron-rebuild": "^1.10.1"
   },
   "scripts": {
     "start": "react-scripts start",
