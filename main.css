@@ -1,0 +1,44 @@
+* {
+  margin: 0px
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.App {
+  background-color: black;
+  position: relative;
+  text-align: center;
+}
+
+.btn {
+  outline: none;
+  padding: 5px 8px;
+  border-radius: 7px;
+  color: white;
+  background-color: #333cb9;
+  border: 1px solid #323892;
+  box-shadow: inset 0px 2px 4px rgba(0,0,0,0.2);
+  margin: 2px 1px;
+}
+
+.main-screen {
+  position: relative;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+}
+
+.eye,
+.pupil,
+.eyewhite,
+.eyelids,
+.absolute {
+  position: absolute;
+}
+
+.pupil {
+  transition: ease-in-out 0.3s;
+}
