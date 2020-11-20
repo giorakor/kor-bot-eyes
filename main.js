@@ -1,9 +1,10 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const _ = require("lodash")
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const SerialHelper = require('./SerialHelper');
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -16,17 +17,19 @@ function createWindow () {
   })
 
   mainWindow.maximize();
-  mainWindow.loadFile('./build/index.html');
+  mainWindow.loadFile('./static/index.html');
   const options = {
     baudRate: 115200,
     delimiter: [0xff, 0xff],
     messageLength: 5
   };
 
-  SerialHelper.init(options, message => {
-    const data = SerialHelper.parseMessage(message);
-    mainWindow.webContents.send("data", data);
-  });
+  SerialHelper.init(options,
+    _.throttle(message => {
+      const data = SerialHelper.parseMessage(message);
+      mainWindow.webContents.send("data", data);
+    }, 20)
+  );
 }
 
 app.whenReady().then(createWindow)

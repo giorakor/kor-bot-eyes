@@ -13,20 +13,21 @@ const intervalTime = (1 / frameRate) * 1000;
 const eyeWhiteImg = "./eye-white.png";
 const pupilImg = "./pupil.png";
 
-const screenWidth = 1000;
-const screenHeight = 576;
+// Graphic constants
+const screenWidth = 564;
+const screenHeight = 386;
 const eyesDistance = 70;
-const eyeWidth = 450;
-const eyeHeight = 400;
-const pupilWidth = 700;
-const pupilHeight = 450;
+const eyeWidth = 230;
+const eyeHeight = 200;
+const pupilWidth = 350;
+const pupilHeight = 250;
 const eyesY = 100;
 const rightPupilOffset = {
-  x: -55,
+  x: -38,
   y: 0
 };
 const leftPupilOffset = {
-  x: -55,
+  x: -22,
   y: 0
 };
 
@@ -62,9 +63,8 @@ const blink = transTime => {
 }
 
 const lookTo = (x, y) => {
-  if (Number.isNaN(x) || Number.isNaN(y)) return
-  rightPupilPos = { x: x + rightPupilOffset.x , y: y + rightPupilOffset.y };
-  leftPupilPos = { x: x + leftPupilOffset.x , y: y + leftPupilOffset.y };
+  rightPupilPos = { x: x + rightPupilOffset.x, y: y + rightPupilOffset.y };
+  leftPupilPos = { x: x + leftPupilOffset.x, y: y + leftPupilOffset.y };
 }
 
 const createEyeLids = isRight => {
@@ -174,7 +174,7 @@ const createEyes = () => {
   };
 
   const leftEyePos = {
-    x: screenWidth / 2 + eyesDistance / 2 ,
+    x: screenWidth / 2 + eyesDistance / 2,
     y: eyesY
   };
 
@@ -195,17 +195,17 @@ const createEyes = () => {
         ${eye}
       </div>
       <svg style="z-index: 100; position: absolute; left: 0; top: 0;" width=${screenWidth} height=${screenHeight}>
-        <rect x=${(screenWidth- eyesDistance) / 2} width=${eyesDistance + 1} height=${screenHeight} fill="black"/>
+        <rect x=${(screenWidth - eyesDistance) / 2} width=${eyesDistance + 1} height=${screenHeight} fill="black"/>
         <rect width=${screenWidth} height=${eyesY} fill="black"/>
-        <rect width=${(screenWidth - eyesDistance)/2 - eyeWidth + 1} height=${screenHeight} fill="black"/>
-        <rect x=${(screenWidth + eyesDistance) / 2 + eyeWidth} width=${(screenWidth - eyesDistance)/2 - eyeWidth} height=${screenHeight} fill="black"/>
+        <rect width=${(screenWidth - eyesDistance) / 2 - eyeWidth + 1} height=${screenHeight} fill="black"/>
+        <rect x=${(screenWidth + eyesDistance) / 2 + eyeWidth} width=${(screenWidth - eyesDistance) / 2 - eyeWidth} height=${screenHeight} fill="black"/>
         <rect y=${eyesY + eyeHeight} width=${screenWidth} height=${screenHeight - eyesY - eyeHeight} fill="black"/>
       </svg>
     </div>
   `);
 }
 
-const setMode = (mode, trans=0.3) => {
+const setMode = (mode, trans = 0.3) => {
   leftEyeMode = mode;
   rightEyeMode = mode;
   modeTransTime = trans;
@@ -239,32 +239,48 @@ const modes = Object.keys(MODES);
 setInterval(() => {
   if (Math.random() > 0.3) {
     randomMoveAmount = {
-      x: parseInt(60*Math.random()) - 30,
-      y: parseInt(20*Math.random()) - 10,
+      x: parseInt(40 * Math.random()) - 20,
+      y: parseInt(20 * Math.random()) - 10,
     };
   }
 }, 700);
 
-// Blink interval
+// Blink interval - currently off, controlled by Arduino
+/*
 setInterval(() => {
   if (Math.random()*10 > 8) {
     blink(0.15);
   }
 }, 1000);
+*/
 
-// Mode switch interval
-setInterval(() => {
-  const mode = modes[Math.floor(modes.length*Math.random())];
-  if (mode === BLINK_MODE) return;
-  setMode(mode, 0.3);
-}, 5000);
+//Mode switch interval - currently off, controlled by Arduino
+/*
+  setInterval(() => {
+    const mode = modes[Math.floor(modes.length*Math.random())];
+    if (mode === BLINK_MODE) return;
+    setMode(mode, 0.3);
+  }, 5000);
+*/
 
-ipcRenderer.on("data", data => {
-  const { pitch, yaw } = data;
-  console.log(pitch, yaw);
-  console.log(rightEyePos);
-  console.log(randomMoveAmount);
-  const yMove = constrain(pitch * 20, -50, 50);
-  const xMove = constrain(-1 * yaw * 2, -100, 100);
+ipcRenderer.on("data", (sender, data) => {
+  const {
+    pitch,
+    yaw,
+    blinkTime,
+    modeNum
+  } = data;
+
+  const xMove = constrain(-1 * yaw * 20, -100, 100);
+  const yMove = constrain(pitch * 20, -100, 100);
+
+  if (blinkTime > 0) {
+    blink(blinkTime / 100)
+  }
+
+  if (!blinking) {
+    setMode(modes[modeNum], 0.3);
+  }
+
   lookTo(xMove, yMove);
 });
