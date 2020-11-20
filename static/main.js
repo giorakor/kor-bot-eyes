@@ -62,6 +62,7 @@ const blink = transTime => {
 }
 
 const lookTo = (x, y) => {
+  if (Number.isNaN(x) || Number.isNaN(y)) return
   rightPupilPos = { x: x + rightPupilOffset.x , y: y + rightPupilOffset.y };
   leftPupilPos = { x: x + leftPupilOffset.x , y: y + leftPupilOffset.y };
 }
