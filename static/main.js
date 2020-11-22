@@ -15,20 +15,20 @@ const pupilImg = "./pupil.png";
 
 // Graphic constants
 const screenWidth = 564;
-const screenHeight = 386;
+const screenHeight = 432; //386;
 const eyesDistance = 70;
 const eyeWidth = 230;
-const eyeHeight = 200;
+const eyeHeight = 220;
 const pupilWidth = 350;
-const pupilHeight = 250;
-const eyesY = 100;
+const pupilHeight = 350;
+const eyesY = 80;
 const rightPupilOffset = {
   x: -38,
-  y: 0
+  y: -20
 };
 const leftPupilOffset = {
   x: -22,
-  y: 0
+  y: -20
 };
 
 let rightPupilPos = clone(rightPupilOffset);
@@ -279,6 +279,7 @@ ipcRenderer.on("data", (sender, data) => {
   }
 
   if (!blinking) {
+    //setMode(modes[1], 0.3);
     setMode(modes[modeNum], 0.3);
   }
 
